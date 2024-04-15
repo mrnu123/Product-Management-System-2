@@ -76,7 +76,7 @@ app.post("/products", (req, res, next) => {
 });
 
 app.get("/products", (req, res, next) => {
-  const products = req.body;
+  const products = req.query;
   Product.find(products)
     .then((data) => {
       return res.status(200).send(data);

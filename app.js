@@ -1,4 +1,4 @@
-require('dotenv').config()
+require("dotenv").config();
 
 const validator = require("validator");
 const mongoose = require("mongoose");
@@ -30,8 +30,6 @@ const productSchema = new mongoose.Schema({
 
 const Product = mongoose.model("Product", productSchema);
 
-const products = [];
-
 const validateProduct = (req, res, next) => {
   const product = req.body;
   const validatedPrice =
@@ -60,7 +58,14 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(validateProduct);
 
-app.post("/products", (req, res) => {
+app.use((err, req, res, next) => {
+  console.error("error middleware");
+  console.error(err.stack);
+  const statusCode = err.status || 500;
+  res.status(statusCode).json({ error: err.message });
+});
+
+app.post("/products", (req, res, next) => {
   const newProduct = new Product(req.body);
   newProduct
     .save()
@@ -68,8 +73,7 @@ app.post("/products", (req, res) => {
       return res.status(201).send(data);
     })
     .catch((err) => {
-      console.error(err);
-      return res.status(500).send(err);
+      next(err);
     });
 });
 
@@ -79,13 +83,17 @@ app.get("/products", (req, res) => {
     .then((data) => {
       return res.status(200).send(data);
     })
-    .catch((err) => res.status(500).send(err));
+    .catch((err) => {
+      next(err);
+    });
 });
 
 app.put("/products/:id", (req, res) => {
   Product.updateOne({ _id: req.params.id }, req.body)
     .then((data) => res.status(200).send("Updated successfully"))
-    .catch((err) => res.status(500).send(err));
+    .catch((err) => {
+      next(err);
+    });
 });
 
 app.delete("/products/:id", (req, res) => {
@@ -93,7 +101,9 @@ app.delete("/products/:id", (req, res) => {
     .then((data) => {
       res.status(200).send("Deleted successfully");
     })
-    .catch((err) => res.status(500).send(err));
+    .catch((err) => {
+      next(err);
+    });
 });
 
 app.listen(port, () => {

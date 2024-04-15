@@ -72,38 +72,30 @@ app.post("/products", (req, res, next) => {
     .then((data) => {
       return res.status(201).send(data);
     })
-    .catch((err) => {
-      next(err);
-    });
+    .catch((err) => next(err));
 });
 
-app.get("/products", (req, res) => {
+app.get("/products", (req, res, next) => {
   const products = req.body;
   Product.find(products)
     .then((data) => {
       return res.status(200).send(data);
     })
-    .catch((err) => {
-      next(err);
-    });
+    .catch((err) => next(err));
 });
 
-app.put("/products/:id", (req, res) => {
+app.put("/products/:id", (req, res, next) => {
   Product.updateOne({ _id: req.params.id }, req.body)
     .then((data) => res.status(200).send("Updated successfully"))
-    .catch((err) => {
-      next(err);
-    });
+    .catch((err) => next(err));
 });
 
-app.delete("/products/:id", (req, res) => {
+app.delete("/products/:id", (req, res, next) => {
   Product.deleteOne({ _id: req.params.id })
     .then((data) => {
       res.status(200).send("Deleted successfully");
     })
-    .catch((err) => {
-      next(err);
-    });
+    .catch((err) => next(err));
 });
 
 app.listen(port, () => {
